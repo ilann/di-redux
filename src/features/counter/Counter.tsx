@@ -8,34 +8,34 @@ import {
   incrementAsync,
   incrementIfOdd,
   selectCount,
+  reloadRequest,
 } from './counterSlice';
 import styles from './Counter.module.css';
+import { selectUserName } from './counterSelectors';
 
 export function Counter() {
   const count = useAppSelector(selectCount);
+  const userName = useAppSelector(selectUserName);
   const dispatch = useAppDispatch();
   const [incrementAmount, setIncrementAmount] = useState('2');
 
   const incrementValue = Number(incrementAmount) || 0;
 
+  const reloadHandler = () => {
+    console.log('Counter compoenent -> Reload handler -> dispatching reloadRequest');
+    dispatch(reloadRequest())
+  };
+
   return (
     <div>
       <div className={styles.row}>
-        <button
-          className={styles.button}
-          aria-label="Decrement value"
-          onClick={() => dispatch(decrement())}
-        >
-          -
-        </button>
+        <span className={styles.value}>[{userName}]</span>
+        <button className={styles.button} onClick={reloadHandler}>Reload User</button>
+      </div>
+      <div className={styles.row}>
+        <button className={styles.button} aria-label="Decrement value" onClick={() => dispatch(decrement())}>-</button>
         <span className={styles.value}>{count}</span>
-        <button
-          className={styles.button}
-          aria-label="Increment value"
-          onClick={() => dispatch(increment())}
-        >
-          +
-        </button>
+        <button className={styles.button} aria-label="Increment value" onClick={() => dispatch(increment())}>+</button>
       </div>
       <div className={styles.row}>
         <input

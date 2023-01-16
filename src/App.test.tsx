@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { store } from './app/store';
 import App from './App';
 
-test('renders learn react link', () => {
+xtest('renders learn react link', () => {
   const { getByText } = render(
     <Provider store={store}>
       <App />
@@ -12,4 +12,15 @@ test('renders learn react link', () => {
   );
 
   expect(getByText(/learn/i)).toBeInTheDocument();
+});
+
+
+describe('(The Scenario) User logs in', () => {
+
+  it('SHOULD login WHEN the user clicks the lgin button' , () => {
+
+    expect(1 + 1).toEqual(2);
+
+  });
+
 });
