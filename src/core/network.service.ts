@@ -11,14 +11,14 @@ export interface INetworkService {
 
     test: () => number;
     get: <T>(usr: string) => Promise<NetworkResponse<T>>;
-    dispose: () => void
+    destroy: () => void
 
 }
 
 export class NetworkService implements INetworkService {
 
     constructor() {
-        console.log ('Network service created');
+        
     }
 
     test() {
@@ -50,8 +50,7 @@ export class NetworkService implements INetworkService {
 
 
     // CLeanup if needed
-    dispose() {
-        console.log ('Network service cleanup is done');
+    destroy() {        
     }
 
 

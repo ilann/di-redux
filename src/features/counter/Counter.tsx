@@ -11,18 +11,17 @@ import {
   reloadRequest,
 } from './counterSlice';
 import styles from './Counter.module.css';
-import { selectUserName } from './counterSelectors';
+import { selectCounterUser } from './counterSelectors';
 
 export function Counter() {
   const count = useAppSelector(selectCount);
-  const userName = useAppSelector(selectUserName);
+  const userName = useAppSelector(selectCounterUser);
   const dispatch = useAppDispatch();
   const [incrementAmount, setIncrementAmount] = useState('2');
 
   const incrementValue = Number(incrementAmount) || 0;
 
   const reloadHandler = () => {
-    console.log('Counter compoenent -> Reload handler -> dispatching reloadRequest');
     dispatch(reloadRequest())
   };
 

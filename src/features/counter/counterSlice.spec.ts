@@ -1,9 +1,8 @@
-import { asClass, AwilixContainer } from 'awilix';
-import { store } from '../../app/store';
+import { asClass } from 'awilix';
 import { INetworkService, NetworkResponse } from '../../core/network.service';
-import { DIContainer, DIServices } from '../../DI/DIContainer';
+import { DIContainer} from '../../DI/DIContainer';
 import { User } from '../../types/User';
-import { selectUserName } from './counterSelectors';
+import { selectCounterUser, selectCounterValue } from './counterSelectors';
 import {
   counterSliceReducer,
   CounterState,
@@ -11,21 +10,20 @@ import {
   decrement,
   incrementByAmount,
   reloadRequest,
+  counterSlice,
 } from './counterSlice';
 
 describe('User can Reload the user', () => {
 
-  // the scoped DI container for the testing
-  let scope: AwilixContainer<DIServices>;
-  
 
   beforeEach(async () => {
 
+   
     // Create a mock for the Network class
     class NetworkServiceMock implements INetworkService {
 
       constructor() {
-        // console.log('*** MOCK Network service created***');
+        // console.log('*** MOCK Network service created ***');
       }
 
       test() { return -1; }
@@ -51,16 +49,17 @@ describe('User can Reload the user', () => {
         });
       }
 
-      dispose() {
-        console.log('Mock networkService is disposed');
+      destroy() {
+        // console.log('+++Mock networkService is disposed+++');
       }
 
     }
-
-    DIContainer.register({
+    
+    await DIContainer.dispose();
+    DIContainer.register({      
       networkService: asClass(NetworkServiceMock)
         .disposer(networkService => {
-          networkService.dispose()
+          networkService.destroy()
         })
         .singleton(),
     });
@@ -68,40 +67,58 @@ describe('User can Reload the user', () => {
   
 
   afterEach(async () => {
+    await DIContainer.dispose();
+  });
 
-    await DIContainer.dispose()
-      .then(() => {
-        // console.log('root is disposed');
-      });
+  // Here we create a test that uses a mock store
+  it ('Test the store *ONE*', async () => {
+    // We must get the store form the DI container, otherwise the dispose will not work
+    const store = DIContainer.cradle.store;
 
+    const counterResetAction = counterSlice.actions.reset;
+    await store.dispatch(counterResetAction({
+      value: 8
+    }));
+
+    await store.dispatch(increment());
+    // selector for the counter value
+    const value = selectCounterValue(store.getState());    
+    expect(value).toBe(9);
+  });
+
+  it ('Test that that store is really clean', async () => {    
+    const store = DIContainer.cradle.store;
+    await store.dispatch(increment());
+    const value = selectCounterValue(store.getState());   
+    expect(value).toBe(1);
   });
 
   it('Service unit: Should reload the user', async () => {
-
     const userService = DIContainer.cradle.userService;
-
     const user = await userService.getUser('1234');    
-
     expect(user?.name).toBe('IlanMock');
-
   });
 
 
-  it('[E2E] Should reload the user', async () => {
+   it('[E2E] Should reload the user', async () => {
 
-    await store.dispatch(reloadRequest());
+    const store = DIContainer.cradle.store;
 
-    // check the Selectors
-    const userName = selectUserName(store.getState());
+     await store.dispatch(reloadRequest());
 
-    expect(userName).toBe('IlanMock');
+  //   // check the Selectors
+     const userName = selectCounterUser(store.getState());
 
-  });
+     expect(userName).toBe('IlanMock');
+
+   });
 
 });
 ////////////////////////
 
+
 describe('counter reducer', () => {
+
   const initialState: CounterState = {
     value: 3,
     status: 'idle',

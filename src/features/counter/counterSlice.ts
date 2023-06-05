@@ -1,9 +1,10 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState, AppThunk } from '../../app/store';
-import { UserService } from '../../core/user.service';
 import { DIContainer } from '../../DI/DIContainer';
 import { User } from '../../types/User';
 import { fetchCount } from './counterAPI';
+
+export const COUNTER_FEATURE_KEY = 'counter';
 
 export interface CounterState {
   value: number;
@@ -56,15 +57,29 @@ export const incrementAsync = createAsyncThunk(
 );
 
 export const counterSlice = createSlice({
-  name: 'counter',
+  name: COUNTER_FEATURE_KEY,
   initialState,
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
+    reset: (state,  action: PayloadAction<Partial<CounterState | undefined>>) => {
+
+      
+      if (action.payload) {        
+        const newstate = {
+          ...initialState,
+          ...action.payload
+        };
+        return newstate;
+      }           
+
+      return initialState;
+    },
     increment: (state) => {
       // Redux Toolkit allows us to write "mutating" logic in reducers. It
       // doesn't actually mutate the state because it uses the Immer library,
       // which detects changes to a "draft state" and produces a brand new
       // immutable state based off those changes
+
       state.value += 1;
     },
     decrement: (state) => {
@@ -115,7 +130,7 @@ export const counterSlice = createSlice({
   },
 });
 
-export const { increment, decrement, incrementByAmount } = counterSlice.actions;
+export const {reset, increment, decrement, incrementByAmount } = counterSlice.actions;
 
 // The function below is called a selector and allows us to select a value from
 // the state. Selectors can also be defined inline where they're used instead of

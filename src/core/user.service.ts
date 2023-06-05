@@ -1,11 +1,12 @@
 import { DIServices } from "../DI/DIContainer";
 import { User } from "../types/User";
-import { INetworkService, NetworkService } from "./network.service";
+import { INetworkService } from "./network.service";
 
 export interface IUserService {
 
     getUser: (userId: string) => Promise<User | undefined>;
-    lastUser:  () => User| undefined
+    lastUser:  () => User| undefined;
+    destroy: () => void;
 
 }
 
@@ -16,9 +17,7 @@ export class UserService implements IUserService {
     private networkService: INetworkService | undefined;
 
     constructor({networkService}: DIServices) {
-
-        this.networkService = networkService;
-        console.log ('User service created');
+        this.networkService = networkService;        
     }
 
     async getUser(userId: string): Promise<User | undefined> {
@@ -32,6 +31,10 @@ export class UserService implements IUserService {
 
     lastUser() {
         return this.user;
+    }
+
+
+    destroy() {        
     }
 
 }
